@@ -58,29 +58,31 @@ app.post("/api/login", function(req, res) {
             console.log(table.rows[0].name);
             if (user_email == table.rows[0].one_gc_email__c) {
               console.log(true);
-              res
-                .status(200)
-                .send({
-                  message:
-                    "Welcome!! User FOUND in Database with details: SSN: " +
-                    table.rows[0].onegc_social_insurance_number__c +
-                    " " +
-                    "Name: " +
-                    table.rows[0].name +
-                    " " +
-                    table.rows[0].onegc_middle_name__c +
-                    " " +
-                    table.rows[0].onegc_last_name__c +
-                    " " +
-                    "Country: " +
-                    table.rows[0].onegc_country__c +
-                    " " +
-                    "Email: " +
-                    table.rows[0].one_gc_email__c +
-                    " " +
-                    "Phone: " +
-                    table.rows[0].onegc_mobile_phone__c
-                });
+              res.send(true);
+              
+              // res
+              //   .status(200)
+              //   .send({
+              //     message:
+              //       "Welcome!! User FOUND in Database with details: SSN: " +
+              //       table.rows[0].onegc_social_insurance_number__c +
+              //       " " +
+              //       "Name: " +
+              //       table.rows[0].name +
+              //       " " +
+              //       table.rows[0].onegc_middle_name__c +
+              //       " " +
+              //       table.rows[0].onegc_last_name__c +
+              //       " " +
+              //       "Country: " +
+              //       table.rows[0].onegc_country__c +
+              //       " " +
+              //       "Email: " +
+              //       table.rows[0].one_gc_email__c +
+              //       " " +
+              //       "Phone: " +
+              //       table.rows[0].onegc_mobile_phone__c
+              //   });
             } else {
               console.log(false);
               res.send(false);
@@ -183,6 +185,31 @@ app.post("/api/benefits", function(req, res) {
     }
   });
 });
+
+app.post('/api/verify_details', function(req, res){
+  pool.connect((err, db, done) => {
+  if(err){
+    return console.log(err);
+  } else {
+  db.query('SELECT * from salesforceonegc.onegc_citizen_profile__c where sfid = $1',['a780b000000AKaFAAW'], (err, table) =>{
+      done();
+      if(err){
+        return console.log(err);
+      } 
+      else if (!table.rows.length) {
+        res.status(200).send({message: 'User Not found in Database!!'});
+      }
+      else {
+        console.log(table.rows[0].one_gc_email__c);
+        console.log(table.rows[0].name);
+        res.status(200).send(table.rows);
+        
+      }
+    });
+  }
+}); 
+});
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log("Listening on port " + PORT));
